@@ -1,2 +1,2 @@
 # actions-test
-test for action CI/CD
+test for github actions CI/CD
