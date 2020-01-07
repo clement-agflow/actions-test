@@ -27,22 +27,11 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: GolangCI-Lint Action
-      uses: actions-contrib/golangci-lint@v0.1.0
-
-  publish:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Run GoReleaser
-      uses: goreleaser/goreleaser-action@v1
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@master
       with:
-        version: latest
-        args: release --rm-dist
-        key: ${{ secrets.YOUR_PRIVATE_KEY }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Publish Docker Action
-      uses: jerray/publish-docker-action@v1.0.3
+        host: ${{ secrets.STAGING_SERVER }}
+        username: deployer
+        key: ${{ secrets.SSH_kEY_STAGING }}
+        port: 22
+        script: whoami
