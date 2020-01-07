@@ -29,3 +29,20 @@ jobs:
 
     - name: GolangCI-Lint Action
       uses: actions-contrib/golangci-lint@v0.1.0
+
+  publish:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Run GoReleaser
+      uses: goreleaser/goreleaser-action@v1
+      with:
+        version: latest
+        args: release --rm-dist
+        key: ${{ secrets.YOUR_PRIVATE_KEY }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish Docker Action
+      uses: jerray/publish-docker-action@v1.0.3
