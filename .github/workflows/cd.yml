@@ -4,13 +4,46 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - develop
+      - master
 
 jobs:
   deploy:
-    name: Deploy to PROD
+    name: Deploy on staging
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out code
         uses: actions/checkout@v1
+
+      - name: Login to DockerHub Registry
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build --tag clement/lol:latest .
+
+      - name: Save and compress Docker image
+        run: docker save clement/lol:latest | gzip > tmp.tar.gz
+
+      - name: Copy image to staging server
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.STAGING_SERVER }}
+          USERNAME: deployer
+          PORT: 22
+          KEY: ${{ secrets.SSH_kEY_STAGING }}
+        with:
+          source: "tmp.tar.gz,docker-compose.yml"
+          target: "docker-deploy/consumer-backend"
+
+      - name: Deploy Docker image on staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_SERVER }}
+          username: deployer
+          key: ${{ secrets.SSH_kEY_STAGING }}
+          port: 22
+          script: |
+            cd docker-deploy/consumer-backend
+            docker load -i tmp.tar.gz
+            rm tmp.tar.gz
+            docker-compose up -d
