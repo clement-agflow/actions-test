@@ -7,7 +7,7 @@ import (
 	"clement.actions/version"
 )
 
-const v = "1.0.0"
+const v = "1.1.0"
 
 func main() {
 	currentVersion, err := version.New(v)
