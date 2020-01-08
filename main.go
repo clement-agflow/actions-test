@@ -1,4 +1,4 @@
-package actions_test
+package main
 
 import (
 	"log"
@@ -13,5 +13,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(currentVersion)
+	log.Println("Version:", currentVersion)
 }

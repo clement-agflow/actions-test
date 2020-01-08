@@ -27,11 +27,35 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: executing remote ssh commands using ssh key
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Build Docker image
+      run: docker build --tag clement/lol:latest .
+
+    - name: Save and compress Docker image
+      run: docker save clement/lol:latest | gzip > tmp.tar.gz
+
+    - name: Copy image to staging server
+      uses: appleboy/scp-action@master
+      env:
+        HOST: ${{ secrets.STAGING_SERVER }}
+        USERNAME: deployer
+        PORT: 22
+        KEY: ${{ secrets.SSH_kEY_STAGING }}
+      with:
+        source: "tmp.tar.gz"
+        target: "tmp.tar.gz"
+
+    - name: Deploy Docker image on staging
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.STAGING_SERVER }}
         username: deployer
         key: ${{ secrets.SSH_kEY_STAGING }}
         port: 22
-        script: whoami
+        script: |
+          docker load -i tmp.tar.gz
+          docker images
