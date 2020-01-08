@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"clement.actions/version"
 )
@@ -14,4 +15,9 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Version:", currentVersion)
+
+	t := time.NewTicker(2 * time.Second)
+	for range t.C {
+		log.Println("tick")
+	}
 }

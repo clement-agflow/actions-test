@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  version-manager:
+    image: clement/lol:latest
+  redis:
+    image: redis:latest
+
